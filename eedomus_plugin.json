@@ -1,0 +1,356 @@
+{
+	"plugin_id": "ask",
+	"name_fr": "Ask eedomus",
+	"icon": "ask.png",
+	"version": "1.4",
+	"creation_date": "2017-12-19",
+	"modification_date": "2018-02-03",
+	"author": "Influman",
+	"description_fr": "Gestion du Ask. L'eedomus vous interroge avant de valider une action.",
+	"description_en": "",
+	"description_es": "",
+	"description_it": "",
+	"description_de": "",
+	"forum_link": "http://forum.eedomus.com/viewtopic.php?f=50&t=6332",
+	"parameters": 
+	[
+		{
+			"parameter": "line1",
+			"description": "Données par défaut",
+			"xtype": "displayfield",
+			"field": "style: 'padding: 3px;', value: '......................................'"
+			},	
+		{
+			"parameter": "DELAI", 
+			"description": "Délai d'expiration : ",
+			"xtype": "combo",
+			"default_value": 30,
+            "field": "width:110, allowBlank:false, store:[[15, '15mn'], [30, '30mn'], [45, '45mn'], [60, '1h'], [90, '1h30'], [120, '2h']], editable: false, shadow: true, triggerAction: 'all', typeAhead:true"
+            },
+		{
+			"parameter": "CANAL", 
+			"description": "Canal de communication :",
+			"xtype": "combo",
+			"default_value": "IFTTTelegram",
+            "field": "width:110, allowBlank:false, store:['PushingBox', 'RegleNotif', 'IFTTTelegram'], editable: false, shadow: true, triggerAction: 'all', typeAhead:true"
+        },
+		{
+			"parameter": "WH", 
+			"description": "Notification IFTTT Telegram",
+			"xtype": "combo",
+			"field": "store : getCombo('/json/list_all.php?actuator_only=1'), displayField: 'label', valueField: 'id', triggerAction: 'all', selectOnFocus: true, editable: false, shadow:true, mode: 'local', width: 250, listWidth: 300, allowBlank: true"
+		},
+		{
+			"parameter": "PB", 
+			"description": "Code API Scénario PushingBox :",
+			"xtype": "textfield",
+			"default_value": " ",
+			"field": "width:250, allowBlank:true"
+        },
+		{
+			"parameter": "line2",
+			"description": "Vos paramètres API eedomus",
+			"xtype": "displayfield",
+			"field": "style: 'padding: 3px;', value: '......................................'"
+			},	
+		{
+                "parameter": "APIU", 
+                "description": "Code API User : ",
+                "xtype": "textfield",
+				"default_value": "",
+				"field": "width:150, allowBlank:false"
+			},
+			{
+                "parameter": "APIS", 
+                "description": "Code API Secret : ",
+                "xtype": "textfield",
+				"default_value": "",
+				"field": "width:150, allowBlank:false"
+			}
+	 ],
+	"scripts":
+	[
+		{
+			"name": "ask.php"
+		}
+	],
+	"devices":
+  [
+		{
+			"device_id": "statut",
+			"module_id": "51",
+			"type": "http",
+			"name_fr": "ASK - Statut",
+			"icon": "ask.png",
+			"utilisation_id": "35",
+			"parameters":
+			{
+				"VAR1": "plugin.parameters.DELAI",
+				"VAR2": "plugin.parameters.CANAL",
+				"VAR3": "",
+				"value_type": "string",
+				"ignore_errors": 1,
+				"RAW_URL": "http://localhost/script/?exec=ask.php&action=statut&type=poll&apiu=plugin.parameters.APIU&apis=plugin.parameters.APIS&apipb=plugin.parameters.PB&apinotif=[VAR3]&apiwh=plugin.parameters.WH",
+				"RAW_XPATH": "/ASK/STATUT",
+				"POLLING": "2"
+			}
+		},
+  		{
+			"device_id": "question",
+			"parent_id": "statut",
+			"module_id": "41",
+			"type": "http",
+			"name_fr": "ASK - 05 - Question",
+			"icon": "ask.png",
+			"utilisation_id": "43",
+			"parameters":
+			{
+				"VAR1": "plugin.parameters.DELAI",
+				"VAR2": "plugin.parameters.CANAL",
+				"VAR3": "",
+				"value_type": "list",
+				"ignore_errors": 1,
+				"RAW_URL": "",
+				"RAW_XPATH": "",
+				"POLLING": "2"
+			},
+			"values":
+			[
+				{ "value": "0", "description": "--", "hidden":1, "icon": "askras.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=question&type=poll&delai=[VAR1]&canal=[VAR2]" },
+				{ "value": "1", "description": "Dois-je fermer les volets ?", "hidden":1, "icon": "askquestion.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=question&type=ask&value=[RAW_VALUE]&delai=[VAR1]&canal=[VAR2]&apiu=plugin.parameters.APIU&apis=plugin.parameters.APIS&apipb=plugin.parameters.PB&apiwh=plugin.parameters.WH" },
+				{ "value": "2", "description": "Dois-je armer l'alarme ?", "hidden":1, "icon": "askquestion.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=question&type=ask&value=[RAW_VALUE]&delai=[VAR1]&canal=[VAR2]&apiu=plugin.parameters.APIU&apis=plugin.parameters.APIS&apipb=plugin.parameters.PB&apiwh=plugin.parameters.WH" },
+				{ "value": "3", "description": "Dois-je fermer le portail ?", "hidden":1, "icon": "askquestion.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=question&type=ask&value=[RAW_VALUE]&delai=[VAR1]&canal=[VAR2]&apiu=plugin.parameters.APIU&apis=plugin.parameters.APIS&apipb=plugin.parameters.PB&apiwh=plugin.parameters.WH" },
+				{ "value": "4", "description": "Une porte est ouverte, dois-je éteindre le chauffage ?", "hidden":1, "icon": "askquestion.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=question&type=ask&value=[RAW_VALUE]&delai=[VAR1]&canal=[VAR2]&apiu=plugin.parameters.APIU&apis=plugin.parameters.APIS&apipb=plugin.parameters.PB&apiwh=plugin.parameters.WH" },
+				{ "value": "5", "description": "Il fait froid, dois-je allumer le chauffage ?", "hidden":1, "icon": "askquestion.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=question&type=ask&value=[RAW_VALUE]&delai=[VAR1]&canal=[VAR2]&apiu=plugin.parameters.APIU&apis=plugin.parameters.APIS&apipb=plugin.parameters.PB&apiwh=plugin.parameters.WH" },
+				{ "value": "6", "description": "Il fait chaud, dois-je allumer la climatisation ?", "hidden":1, "icon": "askquestion.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=question&type=ask&value=[RAW_VALUE]&delai=[VAR1]&canal=[VAR2]&apiu=plugin.parameters.APIU&apis=plugin.parameters.APIS&apipb=plugin.parameters.PB&apiwh=plugin.parameters.WH" }
+			]
+		},
+		{
+			"device_id": "canal",
+			"parent_id": "statut",
+			"module_id": "41",
+			"type": "http",
+			"name_fr": "ASK - 01 - Canal (optionnel)",
+			"icon": "ask.png",
+			"utilisation_id": "43",
+			"parameters":
+			{
+				"VAR1": "plugin.parameters.DELAI",
+				"VAR2": "plugin.parameters.CANAL",
+				"VAR3": "",
+				"value_type": "list",
+				"ignore_errors": 1,
+				"RAW_URL": "",
+				"RAW_XPATH": "",
+				"POLLING": "2"
+			},
+			"values":
+			[
+				{ "value": "0", "description": "--", "hidden":1, "icon": "askras.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=canal&type=poll" },
+				{ "value": "1", "description": "PushingBox", "hidden":1, "icon": "askquestion.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=canal&type=set&value=[RAW_VALUE]" },
+				{ "value": "2", "description": "RegleNotif", "hidden":1, "icon": "askquestion.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=canal&type=set&value=[RAW_VALUE]" },
+				{ "value": "3", "description": "IFTTTelegram", "hidden":1, "icon": "askquestion.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=canal&type=set&value=[RAW_VALUE]" }
+				
+			]
+		},
+		{
+			"device_id": "expir",
+			"parent_id": "statut",
+			"module_id": "41",
+			"type": "http",
+			"name_fr": "ASK - 02 - Délai expiration (optionnel)",
+			"icon": "ask.png",
+			"utilisation_id": "43",
+			"parameters":
+			{
+				"VAR1": "plugin.parameters.DELAI",
+				"VAR2": "plugin.parameters.CANAL",
+				"VAR3": "",
+				"value_type": "list",
+				"ignore_errors": 1,
+				"RAW_URL": "",
+				"RAW_XPATH": "",
+				"POLLING": "2"
+			},
+			"values":
+			[
+				{ "value": "0", "description": "--", "hidden":1, "icon": "askras.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=expir&type=poll" },
+				{ "value": "15", "description": "15mn", "hidden":1, "icon": "askexpir.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=expir&type=set&value=[RAW_VALUE]" },
+				{ "value": "30", "description": "30mn", "hidden":1, "icon": "askexpir.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=expir&type=set&value=[RAW_VALUE]" },
+				{ "value": "45", "description": "45mn", "hidden":1, "icon": "askexpir.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=expir&type=set&value=[RAW_VALUE]" },
+				{ "value": "60", "description": "1h", "hidden":1, "icon": "askexpir.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=expir&type=set&value=[RAW_VALUE]" },
+				{ "value": "90", "description": "1h30mn", "hidden":1, "icon": "askexpir.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=expir&type=set&value=[RAW_VALUE]" },
+				{ "value": "120", "description": "2h", "hidden":1, "icon": "askexpir.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=expir&type=set&value=[RAW_VALUE]" }
+			]
+		},
+		{
+			"device_id": "msgreponse",
+			"parent_id": "statut",
+			"module_id": "41",
+			"type": "http",
+			"name_fr": "ASK - 03 - Message Réponse OK",
+			"icon": "ask.png",
+			"utilisation_id": "43",
+			"parameters":
+			{
+				"VAR1": "plugin.parameters.DELAI",
+				"VAR2": "plugin.parameters.CANAL",
+				"VAR3": "",
+				"value_type": "list",
+				"ignore_errors": 1,
+				"RAW_URL": "",
+				"RAW_XPATH": "",
+				"POLLING": "2"
+			},
+			"values":
+			[
+				{ "value": "0", "description": "--", "hidden":1, "icon": "askras.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=msgreponse&type=poll" },
+				{ "value": "1", "description": "Ok, je ferme les volets", "hidden":1, "icon": "askaction.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=msgreponse&type=set&value=[RAW_VALUE]" },
+				{ "value": "2", "description": "Ok, j'active l'alarme", "hidden":1, "icon": "askaction.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=msgreponse&type=set&value=[RAW_VALUE]" },
+				{ "value": "3", "description": "Ok, je ferme le portail", "hidden":1, "icon": "askaction.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=msgreponse&type=set&value=[RAW_VALUE]" },
+				{ "value": "4", "description": "Ok, j'éteins le chauffage", "hidden":1, "icon": "askaction.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=msgreponse&type=set&value=[RAW_VALUE]" },
+				{ "value": "5", "description": "Ok, j'allume le chauffage", "hidden":1, "icon": "askaction.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=msgreponse&type=set&value=[RAW_VALUE]" },
+				{ "value": "6", "description": "Ok, j'allume la climatisation", "hidden":1, "icon": "askaction.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=msgreponse&type=set&value=[RAW_VALUE]" },
+				{ "value": "99", "description": "Annulation bien reçue", "hidden":1, "icon": "askaction.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=msgreponse&type=poll" },
+				{ "value": "999", "description": "Snooze Ok", "hidden":1, "icon": "askaction.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=msgreponse&type=poll" }
+			]
+		},
+		{
+			"device_id": "actionexpir",
+			"parent_id": "statut",
+			"module_id": "41",
+			"type": "http",
+			"name_fr": "ASK - 04 - Action à expiration (optionnel)",
+			"icon": "ask.png",
+			"utilisation_id": "43",
+			"parameters":
+			{
+				"VAR1": "plugin.parameters.DELAI",
+				"VAR2": "plugin.parameters.CANAL",
+				"VAR3": "",
+				"value_type": "list",
+				"ignore_errors": 1,
+				"RAW_URL": "",
+				"RAW_XPATH": "",
+				"POLLING": "2"
+			},
+			"values":
+			[
+				{ "value": "0", "description": "--", "hidden":1, "icon": "askras.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=actionexpir&type=poll" },
+				{ "value": "1", "description": "Je ferme les volets", "hidden":1, "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=actionexpir&type=set&value=[RAW_VALUE]" },
+				{ "value": "2", "description": "J'active l'alarme", "hidden":1, "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=actionexpir&type=set&value=[RAW_VALUE]" },
+				{ "value": "3", "description": "Je ferme le portail", "hidden":1, "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=actionexpir&type=set&value=[RAW_VALUE]" },
+				{ "value": "4", "description": "J'éteins le chauffage", "hidden":1, "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=actionexpir&type=set&value=[RAW_VALUE]" },
+				{ "value": "5", "description": "J'allume le chauffage", "hidden":1, "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=actionexpir&type=set&value=[RAW_VALUE]" },
+				{ "value": "6", "description": "J'allume la climatisation", "hidden":1, "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=actionexpir&type=set&value=[RAW_VALUE]" },
+				{ "value": "7", "description": "Autre action expiration #7", "hidden":1, "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=actionexpir&type=set&value=[RAW_VALUE]" },
+				{ "value": "8", "description": "Autre action expiration #8", "hidden":1, "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=actionexpir&type=set&value=[RAW_VALUE]" },
+				{ "value": "9", "description": "Autre action expiration #9", "hidden":1, "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=actionexpir&type=set&value=[RAW_VALUE]" }
+			]
+		},
+		{
+			"device_id": "reponse",
+			"parent_id": "statut",
+			"module_id": "41",
+			"type": "http",
+			"name_fr": "ASK - Réponse",
+			"icon": "ask.png",
+			"utilisation_id": "43",
+			"parameters":
+			{
+				"VAR1": "plugin.parameters.DELAI",
+				"VAR2": "plugin.parameters.CANAL",
+				"VAR3": "",
+				"value_type": "list",
+				"ignore_errors": 1,
+				"RAW_URL": "http://localhost/script/?exec=ask.php&action=reponse&type=poll",
+				"RAW_XPATH": "/ASK/REPONSE",
+				"POLLING": "2"
+			},
+			"values":
+			[
+				{ "value": "0", "description": "--", "hidden":1, "icon": "askras.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=reponse&type=poll" },
+				{ "value": "1", "description": "Oui (Q1)", "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=reponse&type=set&value=[RAW_VALUE]&apipb=plugin.parameters.PB&apiwh=plugin.parameters.WH" },
+				{ "value": "2", "description": "Non (Q1)", "icon": "askko.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=reponse&type=set&value=[RAW_VALUE]&apipb=plugin.parameters.PB&apiwh=plugin.parameters.WH" },
+				{ "value": "3", "description": "Snooze (Q1)", "icon": "asksnooze.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=reponse&type=set&value=[RAW_VALUE]&apipb=plugin.parameters.PB&apiwh=plugin.parameters.WH" },
+				{ "value": "4", "description": "Oui (Q2)", "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=reponse&type=set&value=[RAW_VALUE]&apipb=plugin.parameters.PB&apiwh=plugin.parameters.WH" },
+				{ "value": "5", "description": "Non (Q2)", "icon": "askko.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=reponse&type=set&value=[RAW_VALUE]&apipb=plugin.parameters.PB&apiwh=plugin.parameters.WH" },
+				{ "value": "6", "description": "Snooze (Q2)", "icon": "asksnooze.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=reponse&type=set&value=[RAW_VALUE]&apipb=plugin.parameters.PB&apiwh=plugin.parameters.WH" },
+				{ "value": "97", "description": "Oui (ifttt)", "hidden":1, "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=reponse&type=set&value=[RAW_VALUE]&apipb=plugin.parameters.PB&apiwh=plugin.parameters.WH" },
+				{ "value": "98", "description": "Non (ifttt)", "hidden":1, "icon": "askko.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=reponse&type=set&value=[RAW_VALUE]&apipb=plugin.parameters.PB&apiwh=plugin.parameters.WH" },
+				{ "value": "99", "description": "Snooze (ifttt)", "hidden":1, "icon": "asksnooze.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=reponse&type=set&value=[RAW_VALUE]&apipb=plugin.parameters.PB&apiwh=plugin.parameters.WH" }
+			]
+		},
+		{
+			"device_id": "action",
+			"parent_id": "statut",
+			"module_id": "41",
+			"type": "http",
+			"name_fr": "ASK - Action",
+			"icon": "ask.png",
+			"utilisation_id": "43",
+			"parameters":
+			{
+				"VAR1": "plugin.parameters.DELAI",
+				"VAR2": "plugin.parameters.CANAL",
+				"VAR3": "",
+				"value_type": "list",
+				"ignore_errors": 1,
+				"RAW_URL": "http://localhost/script/?exec=ask.php&action=action&type=poll",
+				"RAW_XPATH": "/ASK/ACTION",
+				"POLLING": "2"
+			},
+			"values":
+			[
+				{ "value": "0", "description": "--", "hidden":1, "icon": "askras.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=void" },
+				{ "value": "1", "description": "[ASK] Fermeture volets", "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=void" },
+				{ "value": "2", "description": "[ASK] Activation de l'alarme",  "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=void" },
+				{ "value": "3", "description": "[ASK] Fermeture du portail",  "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=void" },
+				{ "value": "4", "description": "[ASK] Extinction du chauffage",  "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=void" },
+				{ "value": "5", "description": "[ASK] Allumage du chauffage",  "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=void" },
+				{ "value": "6", "description": "[ASK] Allumage de la climatisation",  "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=void" },
+				{ "value": "7", "description": "[ASK] Autre action #7",  "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=void" },
+				{ "value": "8", "description": "[ASK] Autre action #8", "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=void" },
+				{ "value": "9", "description": "[ASK] Autre action #9",  "icon": "askok.png", "http_url": "http://localhost/script/?exec=ask.php", "http_type": "GET",  "http_params": "&action=void" }
+			]
+		},
+		{
+			"device_id": "notif1",
+			"parent_id": "statut",
+			"module_id": "11",
+			"name_fr": "ASK - Notification (Q1)",
+			"icon": "ask.png",
+			"utilisation_id": "35",
+			"parameters":
+			{
+				"VAR1": "plugin.parameters.DELAI",
+				"VAR2": "plugin.parameters.CANAL",
+				"VAR3": "",
+				"value_type": "string",
+				"ignore_errors": 1,
+				"RAW_URL": "",
+				"RAW_XPATH": "",
+				"POLLING": ""
+			}
+		},
+		{
+			"device_id": "notif2",
+			"parent_id": "statut",
+			"module_id": "11",
+			"name_fr": "ASK - Notification (Q2)",
+			"icon": "ask.png",
+			"utilisation_id": "35",
+			"parameters":
+			{
+				"VAR1": "plugin.parameters.DELAI",
+				"VAR2": "plugin.parameters.CANAL",
+				"VAR3": "",
+				"value_type": "string",
+				"ignore_errors": 1,
+				"RAW_URL": "",
+				"RAW_XPATH": "",
+				"POLLING": ""
+			}
+		}
+	]
+}
