@@ -127,7 +127,7 @@ Pour gérer vos réponses dans Telegram,
   * Mettez "Oui" comme Key phrase et "(...)" comme "What to send as a reply"
   * Pour THAT, sélectionner l'action "Make a web Request" du service "Webhooks"
   * dans l'URL, insérer la requête API eedomus permettant de positionner le périphérique "Ask - Reponse" (via son code API noté précédemment) à la valeur 97
-  * ex:  https://api.eedomus.com/set?action=periph.value&periph_id=888888&value=97&api_user=XXXXXXX&api_secret=aaaaaaabbbbbbcccc
+  * ex:  <https://api.eedomus.com/set?action=periph.value&periph_id=888888&value=97&api_user=XXXXXXX&api_secret=aaaaaaabbbbbbcccc>
   
  ![WH4](https://i.imgur.com/nk9Uu83.png) 
  
