@@ -9,11 +9,18 @@ L'été, cependant, vous aimez rester tard dans votre jardin. Et dans ce cas, la f
 Par confort, mais aussi par sécurité, pour ne pas se retrouver enfermé dehors.  
   
 Dans votre règle actuelle, au lieu d'agir directement, vous exécutez les paramètres d'Ask, et l'eedomus vous demande confirmation avant d'agir.  
-Dans les paramètres d'Ask, vous définissez la question à poser, l'action à réaliser en cas de réponse positive, et l'action à réaliser automatiquement en cas d'absence de réponse après le délai d'expiration de votre choix.  
+Dans les paramètres d'Ask, avant utilisation, vous définissez la question à poser, l'action à réaliser en cas de réponse positive, et l'action à réaliser automatiquement en cas d'absence de réponse après le délai d'expiration de votre choix.  
   
 Ask envoie la question sur un canal de communication.  
 Vous avez alors le choix de répondre Oui, Non, ou de Temporiser (Snooze) pour que l'eedomus repose la question dans 30mn.  
-Ask positionne alors l'action dans un état. Action qui cette fois-ci devra bien agir sur les volets via une règle de votre choix.  
+Ask positionne alors l'action dans un état informatif. Action qui devra alors être interprétée par la ou les règles de votre choix.  
+  
+Ask joue en réalité le rôle de passerelle :  
+Votre règle initiale n'active pas vos actions, elle pose la question via les paramètres Ask en amont.
+Quand vous répondez Oui, ou à l'expiration (si paramétrée), Ask poste l'action souhaitée.  
+Une règle que vous devrez alors créer en aval devra détecter cette action Ask pour cette fois-ci bien exécuter les actions souhaitées sur vos périphériques.  
+Ce mode de fonctionnement permet de rendre Ask indépendant de vos scènes et périphériques pour un usage donné.  
+  
   
 
 ### Ajout des périphériques
@@ -60,6 +67,14 @@ Vos différentes "Actions à l'expiration" sont à rajouter dans les valeurs de l'a
 A la réponse positive, ou à l'expiration avec action, le capteur "Ask - Action" sera positionné sur l'action sélectionnée, de même valeur numérique.  
 Assurez-vous donc bien que les valeurs numériques (value) des actions distinctes de "Ask - 03 - Message Réponse OK"  et "Ask - 04 - Action à expiration (optionnel)" se retrouvent bien dans le capteur "Ask - Action".  
 A vous d'y associer ensuite des règles en fonction de la valeur de ce capteur, pour impacter les périphériques souhaités ("Ask - Action" DEVIENT MAINTENANT "[ASK] Fermeture volets" ALORS ...)  
+  
+
+Par exemple, si vous paramétrez la valeur 10 suivante dans "Ask - Message Réponse OK" :  
+* Value 10 / Description "Ok, j'active ma scène Scène#1"  
+alors il faut créer dans Ask-Action la valeur 10 également :  
+* Value 10 / Description "Activation de la scène Scène#1".  
+Si vous souhaitez que cette valeur 10 soit positionnable à l'expiration d'une requête, on ajoute la valeur 10 dans Ask-Action à expiration :  
+* Value 10 / Description "Expiration, j'active la scène Scène#1".  
   
   
 ### Interactions
