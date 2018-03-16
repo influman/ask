@@ -1,5 +1,7 @@
 # Installation
-Gestion des Questions/Réponses (ASK) avec eedomus 
+Gestion des Questions/Réponses (ASK) avec eedomus  
+  
+[Documentacion en espanol](http://www.domoticadomestica.com/el-comando-ask-ya-esta-disponible-en-eedomus/ "Domotica Domestica") 
     
 ### Les principes
   
