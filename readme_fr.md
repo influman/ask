@@ -156,6 +156,12 @@ Enjoy !
  ![TLGM2](https://i.imgur.com/klt8pEl.jpg) 
    
    
+   
+Influman 2018  
+therealinfluman@gmail.com  
+[Paypal Me](https://www.paypal.me/influman "paypal.me")  
+
+
   
 
 
