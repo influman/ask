@@ -1,21 +1,21 @@
 <?php
    $xml = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>";      
    //***********************************************************************************************************************
-   // V1.4 : Ask Eedomus
+   // V1.44 : Ask Eedomus
    
 	// recuperation des infos depuis la requete
-    $action = getArg("action", $mandatory = true, $default = 'statut');
-	$type = getArg("type", $mandatory = true, $default = 'poll');
-	$delai = getArg("delai", $mandatory = false, $default = 30);
-	$canal = getArg("canal", $mandatory = false, $default = 'email');
-	$value = getArg("value", $mandatory = false, $default = '');
-	$apipb = getArg("apipb", $mandatory = false, $default = '');
-	$apiwh = getArg("apiwh", $mandatory = false, $default = '');
+    $action = getArg("action", true, 'statut');
+	$type = getArg("type", true, 'poll');
+	$delai = getArg("delai", false, 30);
+	$canal = getArg("canal", false, 'email');
+	$value = getArg("value", false, '');
+	$apipb = getArg("apipb", false, '');
+	$apiwh = getArg("apiwh", false, '');
 	
 	
     // API eedomus
-	$api_user = getArg("apiu", $mandatory = false, $default = '');
-	$api_secret = getArg("apis", $mandatory = false, $default = '');
+	$api_user = getArg("apiu", false, '');
+	$api_secret = getArg("apis", false, '');
 	// API DU PERIPHERIQUE APPELANT LE SCRIPT
     $periph_id = getArg('eedomus_controller_module_id'); 
 	
@@ -182,7 +182,7 @@
 			
 			// Poste la question sur le canal
 			$envoi = sdk_envoiMessage($tab_ask[$next_ask]["question_txt"], $tab_ask[$next_ask]["canal"], $urlOui, $urlNon, $urlSnooze, $tab_ask[$next_ask]["expirdate"], $tab_ask[$next_ask]["actionexpir_txt"], $apinotif);
-			setValue($periph_id, 0, $update_only = true);
+			setValue($periph_id, 0, true);
 			
 			die();
 		}
@@ -197,7 +197,7 @@
 			// l'action choisit sera la réponse donnée par l'eedomus
 			saveVariable('ASK_MSGREPONSE', $value);
 			saveVariable('ASK_MSGREPONSE_API', $periph_id);
-			setValue($periph_id, 0, $update_only = true);
+			setValue($periph_id, 0, true);
 			die();
 		}
 		if ($type == 'poll') {
@@ -215,23 +215,7 @@
 			$canal_reponse = "";
 			$msg_reponse_non = "";
 			$msg_reponse_snooze = "";
-			// lecture texte du périphérique "Réponse"
-			if ($value == 1 || $value == 2 || $value == 3) {
-				$tab_reponse = getPeriphValueList($tab_ask[1]["reponse_api"]);
-				
-			}
-			if ($value == 4 || $value == 5 || $value == 6) {
-				$tab_reponse = getPeriphValueList($tab_ask[2]["reponse_api"]);
-				
-			}
-			foreach($tab_reponse As $tab_reponse_value) {
-				if ($tab_reponse_value["value"] == 99) {
-					$msg_reponse_non = $tab_reponse_value["state"]; // reponse textuelle si non
-				}
-				if ($tab_reponse_value["value"] == 999) {
-					$msg_reponse_snooze = $tab_reponse_value["state"]; // reponse textuelle si snooze
-				}
-			}
+			
 			if ($value == 97) { // Oui depuis IFTTT-Telegram
 				if ($last_ask == 1) { 
 					$value = 1;
@@ -254,9 +238,27 @@
 				}
 			}
 			
+			// lecture texte du périphérique "Réponse"
+			if ($value == 1 || $value == 2 || $value == 3) {
+				$tab_reponse = getPeriphValueList($tab_ask[1]["reponse_api"]);
+				
+			}
+			if ($value == 4 || $value == 5 || $value == 6) {
+				$tab_reponse = getPeriphValueList($tab_ask[2]["reponse_api"]);
+				
+			}
+			foreach($tab_reponse As $tab_reponse_value) {
+				if ($tab_reponse_value["value"] == 99) {
+					$msg_reponse_non = $tab_reponse_value["state"]; // reponse textuelle si non
+				}
+				if ($tab_reponse_value["value"] == 999) {
+					$msg_reponse_snooze = $tab_reponse_value["state"]; // reponse textuelle si snooze
+				}
+			}
+			
 			if ($value == 1) { // Oui 1ère ASK
 				if ($tab_ask[1]["reponse_api"] != 0) {
-					setValue($tab_ask[1]["reponse_api"], $tab_ask[1]["reponse"], $update_only = true);
+					setValue($tab_ask[1]["reponse_api"], $tab_ask[1]["reponse"], true);
 					$setaction = sdk_setAction($tab_ask[1]["reponse"]);
 					$msg_reponse = $tab_ask[1]["reponse_txt"];
 					$canal_reponse = $tab_ask[1]["canal"];
@@ -265,7 +267,7 @@
 			}
 			if ($value == 4) { // Oui 2nde ASK
 				if ($tab_ask[2]["reponse_api"] != 0) {
-					setValue($tab_ask[2]["reponse_api"], $tab_ask[2]["reponse"], $update_only = true);
+					setValue($tab_ask[2]["reponse_api"], $tab_ask[2]["reponse"], true);
 					$setaction = sdk_setAction($tab_ask[2]["reponse"]);
 					$msg_reponse = $tab_ask[2]["reponse_txt"];
 					$canal_reponse = $tab_ask[2]["canal"];
@@ -274,7 +276,7 @@
 			}
 			if ($value == 2) { // Non 1ère ASK
 				if ($tab_ask[1]["reponse_api"] != 0) {
-					setValue($tab_ask[1]["reponse_api"], 99, $update_only = true);
+					setValue($tab_ask[1]["reponse_api"], 99, true);
 					$msg_reponse = $msg_reponse_non;
 					$canal_reponse = $tab_ask[1]["canal"];
 				}
@@ -282,7 +284,7 @@
 			}
 			if ($value == 5) { // Non 2nde ASK
 				if ($tab_ask[2]["reponse_api"] != 0) {
-					setValue($tab_ask[2]["reponse_api"], 99, $update_only = true);
+					setValue($tab_ask[2]["reponse_api"], 99, true);
 					$msg_reponse = $msg_reponse_non;
 					$canal_reponse = $tab_ask[2]["canal"];
 				}
@@ -297,7 +299,7 @@
 			   $msg_reponse = $msg_reponse_snooze;
 			   $canal_reponse = $tab_ask[1]["canal"];
 			   if ($tab_ask[1]["reponse_api"] != 0) {
-					setValue($tab_ask[1]["reponse_api"], 999, $update_only = true);
+					setValue($tab_ask[1]["reponse_api"], 999, true);
 			   }
 			}
 			if ($value == 6) { // Snooze 2nde ASK
@@ -309,16 +311,16 @@
 				$msg_reponse = $msg_reponse_snooze;
 			    $canal_reponse = $tab_ask[2]["canal"];
 				if ($tab_ask[2]["reponse_api"] != 0) {
-					setValue($tab_ask[2]["reponse_api"], 999, $update_only = true);
+					setValue($tab_ask[2]["reponse_api"], 999, true);
 			   }
 			}
 			
-			if ($msg_reponse != "" && $canal_reponse !="") {
+			if ($msg_reponse != "" && $canal_reponse != "") {
 				// envoi de la réponse selon le canal
 				$envoi = sdk_envoiMessage($msg_reponse, $canal_reponse, "", "", "", "", "", "");
 			}
 			saveVariable('ASK', $tab_ask);
-			setValue(loadVariable('ASK_REPONSE_API'), 0, $update_only = true);
+			setValue(loadVariable('ASK_REPONSE_API'), 0, true);
 			die();
 		}
 		if ($type == 'poll') {
@@ -333,7 +335,7 @@
 	if ($action == 'canal' && $value > 0) {
 			saveVariable('ASK_CANAL', $value);
 			saveVariable('ASK_CANAL_API', $periph_id);
-			setValue($periph_id, 0, $update_only = true);
+			setValue($periph_id, 0, true);
 			die();
 		
 	}
@@ -342,7 +344,7 @@
 	if ($action == 'actionexpir' && $value > 0) {
 			saveVariable('ASK_ACTIONEXPIR', $value);
 			saveVariable('ASK_ACTIONEXPIR_API', $periph_id);
-			setValue($periph_id, 0, $update_only = true);
+			setValue($periph_id, 0, true);
 			die();
 		
 	}
@@ -350,7 +352,7 @@
 	// enregistrement du délai d'expiration donné en règle Ask
 	if ($action == 'expir' && $value > 0) {
 		saveVariable('ASK_DELAI', $value);
-		setValue($periph_id, 0, $update_only = true);
+		setValue($periph_id, 0, true);
 		die();
 	}
 	
@@ -408,7 +410,7 @@
 			if ($tab_ask[1]["expirdate"] <= $timestamp) {
 			// requête expirée
 				if ($tab_ask[1]["actionexpir"] > 0) {
-					setValue($tab_ask[1]["actionexpir_api"], $tab_ask[1]["actionexpir"], $update_only = true);
+					setValue($tab_ask[1]["actionexpir_api"], $tab_ask[1]["actionexpir"], true);
 					$envoi = sdk_envoiMessage($tab_ask[1]["actionexpir_txt"], $tab_ask[1]["canal"], "", "", "", "", "", "");
 					$setaction = sdk_setAction($tab_ask[1]["actionexpir"]);
 					
@@ -420,7 +422,7 @@
 			if ($tab_ask[1]["snoozedate"] <= $timestamp && $tab_ask[1]["snoozedate"] != 0) {
 			// snooze atteint
 				$tab_ask[1]["snoozedate"] = 0;
-				setValue($tab_ask[1]["reponse_api"], 0, $update_only = true);
+				setValue($tab_ask[1]["reponse_api"], 0, true);
 				$api_reponse = loadVariable('ASK_REPONSE_API');
 				saveVariable('ASK', $tab_ask);
 				$value_reponse_oui = 1;
@@ -437,7 +439,7 @@
 			if ($tab_ask[2]["expirdate"] <= $timestamp) {
 			// requête expirée
 				if ($tab_ask[2]["actionexpir"] > 0) {
-					setValue($tab_ask[2]["actionexpir_api"], $tab_ask[2]["actionexpir"], $update_only = true);
+					setValue($tab_ask[2]["actionexpir_api"], $tab_ask[2]["actionexpir"], true);
 					$envoi = sdk_envoiMessage($tab_ask[2]["actionexpir_txt"], $tab_ask[2]["canal"], "", "", "", "", "", "");
 					$setaction = sdk_setAction($tab_ask[2]["actionexpir"]);
 					
@@ -475,7 +477,7 @@
 	function sdk_setAction($value) {
 		$preload = loadVariable('ASK_ACTION_API');
 		if (is_numeric($preload) && $preload > 1 && $value > 0) {
-			setValue($preload, $value, $update_only = true);
+			setValue($preload, $value, true);
 		}
 	}
 	
